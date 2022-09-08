@@ -16,6 +16,7 @@ namespace Demo_T1.Controllers
         ISingletonService _singletonService1;
         ISingletonService _singletonService2;
 
+        private readonly ILogger _logger;
         public HomeController(ITransientService transientService1,
                               ITransientService transientService2,
 
@@ -23,8 +24,11 @@ namespace Demo_T1.Controllers
                                 IScopedService scopedService2,
 
                                 ISingletonService singletonService1,
-                                ISingletonService singletonService2)
+                                ISingletonService singletonService2,
+                                ILogger<ISingletonService> logger)
         {
+            _logger = logger;
+
             _transientService1 = transientService1;
             _transientService2 = transientService2;
 
@@ -33,6 +37,7 @@ namespace Demo_T1.Controllers
 
             _singletonService1 = singletonService1;
             _singletonService2 = singletonService2;
+           
 
         }
 
@@ -47,7 +52,8 @@ namespace Demo_T1.Controllers
 
             ViewBag.message5 = "First Instance " + _singletonService1.GetID().ToString();
             ViewBag.message6 = "Second Instance " + _singletonService2.GetID().ToString();
-
+            _logger.LogInformation("About page visited at {DT}",
+           DateTime.UtcNow.ToLongTimeString());
             return View();
         }
     }

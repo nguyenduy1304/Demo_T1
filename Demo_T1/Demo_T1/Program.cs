@@ -7,6 +7,15 @@ using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+//{
+//    Args = args,
+//    // Examine Hosting environment: logging value
+//    EnvironmentName = Environments.Staging,
+//    WebRootPath = "wwwroot-custom"
+//});
+
+
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
@@ -24,8 +33,9 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<ITransientService, SomeService>();
 builder.Services.AddScoped<IScopedService, SomeService>();
 builder.Services.AddSingleton<ISingletonService, SomeService>();
+builder.Services.AddDirectoryBrowser();
 
-////Static file authorization
+//////Static file authorization
 //builder.Services.AddAuthorization(options =>
 //{
 //    options.FallbackPolicy = new AuthorizationPolicyBuilder()
@@ -87,12 +97,23 @@ app.UseStatusCodePages(async statusCodeContext =>
 });
 
 app.UseHttpsRedirection();
-
-
-
-
-
 app.UseStaticFiles();
+
+//var fileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.WebRootPath, "images"));
+//var requestPath = "/MyImages";
+
+//// Enable displaying browser links.
+//app.UseStaticFiles(new StaticFileOptions
+//{
+//    FileProvider = fileProvider,
+//    RequestPath = requestPath
+//});
+
+//app.UseDirectoryBrowser(new DirectoryBrowserOptions
+//{
+//    FileProvider = fileProvider,
+//    RequestPath = requestPath
+//});
 
 app.UseRouting();
 
