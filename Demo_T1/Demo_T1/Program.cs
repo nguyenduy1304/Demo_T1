@@ -33,7 +33,10 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<ITransientService, SomeService>();
 builder.Services.AddScoped<IScopedService, SomeService>();
 builder.Services.AddSingleton<ISingletonService, SomeService>();
+
 builder.Services.AddDirectoryBrowser();
+
+builder.Services.AddHttpClient();
 
 //////Static file authorization
 //builder.Services.AddAuthorization(options =>
@@ -99,21 +102,21 @@ app.UseStatusCodePages(async statusCodeContext =>
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-//var fileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.WebRootPath, "images"));
-//var requestPath = "/MyImages";
+var fileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.WebRootPath, "images"));
+var requestPath = "/MyImages";
 
-//// Enable displaying browser links.
-//app.UseStaticFiles(new StaticFileOptions
-//{
-//    FileProvider = fileProvider,
-//    RequestPath = requestPath
-//});
+// Enable displaying browser links.
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = fileProvider,
+    RequestPath = requestPath
+});
 
-//app.UseDirectoryBrowser(new DirectoryBrowserOptions
-//{
-//    FileProvider = fileProvider,
-//    RequestPath = requestPath
-//});
+app.UseDirectoryBrowser(new DirectoryBrowserOptions
+{
+    FileProvider = fileProvider,
+    RequestPath = requestPath
+});
 
 app.UseRouting();
 

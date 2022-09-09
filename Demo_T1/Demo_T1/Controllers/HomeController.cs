@@ -1,12 +1,23 @@
 ﻿using Demo_T1.Models;
 using Demo_T1.Services;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
+using Newtonsoft.Json;
 using System.Diagnostics;
+using System.Text.Json;
 
 namespace Demo_T1.Controllers
 {
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    [IgnoreAntiforgeryToken]
     public class HomeController : Controller
     {
+        
+        private readonly ILogger _logger;
+
+        #region DI
         ITransientService _transientService1;
         ITransientService _transientService2;
 
@@ -16,7 +27,36 @@ namespace Demo_T1.Controllers
         ISingletonService _singletonService1;
         ISingletonService _singletonService2;
 
-        private readonly ILogger _logger;
+        #endregion
+
+        #region Access the exception
+        public string? RequestId { get; set; }
+
+        public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+
+        public string? ExceptionMessage { get; set; }
+
+        //public void OnGet()
+        //{
+        //    RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+
+        //    var exceptionHandlerPathFeature =
+        //        HttpContext.Features.Get<IExceptionHandlerPathFeature>();
+
+        //    if (exceptionHandlerPathFeature?.Error is FileNotFoundException)
+        //    {
+        //        ExceptionMessage = "The file was not found.";
+        //    }
+
+        //    if (exceptionHandlerPathFeature?.Path == "/Home/Privacy")
+        //    {
+        //        ExceptionMessage ??= string.Empty;
+        //        ExceptionMessage += " Page: Home/.";
+        //    }
+        //}
+
+        #endregion
+
         public HomeController(ITransientService transientService1,
                               ITransientService transientService2,
 
@@ -25,7 +65,7 @@ namespace Demo_T1.Controllers
 
                                 ISingletonService singletonService1,
                                 ISingletonService singletonService2,
-                                ILogger<ISingletonService> logger)
+                                ILogger<HomeController> logger)
         {
             _logger = logger;
 
@@ -40,9 +80,15 @@ namespace Demo_T1.Controllers
            
 
         }
-
+        //public void OnGet()
+        //{
+        //    _logger.LogInformation("Xin chào nhá!!! {DT}",
+        //        DateTime.UtcNow.ToLongTimeString());
+        //}
+        [Route("home/index")]
         public IActionResult Index()
         {
+            #region ViewBag
 
             ViewBag.message1 = "First Instance " + _transientService1.GetID().ToString();
             ViewBag.message2 = "Second Instance " + _transientService2.GetID().ToString();
@@ -52,8 +98,42 @@ namespace Demo_T1.Controllers
 
             ViewBag.message5 = "First Instance " + _singletonService1.GetID().ToString();
             ViewBag.message6 = "Second Instance " + _singletonService2.GetID().ToString();
-            _logger.LogInformation("About page visited at {DT}",
-           DateTime.UtcNow.ToLongTimeString());
+
+            #endregion
+
+            #region Logging
+            _logger.LogInformation("Xin chào LogInformation nhá !!! {DT}",
+                DateTime.UtcNow.ToLongTimeString());
+
+            _logger.LogError("Xin chào LogError nhá !!! {DT}",
+                DateTime.UtcNow.ToLongTimeString());
+
+            _logger.LogWarning("Xin chào LogWarning nhá !!! {DT}",
+               DateTime.UtcNow.ToLongTimeString());
+            #endregion
+
+            GetAPI();
+            return View();
+        }
+        public async Task GetAPI()
+        {
+            var url = "https://catfact.ninja/fact";
+            using var client = new HttpClient();
+
+            var result = await client.GetAsync(url);
+            var content =await result.Content.ReadAsStringAsync();
+            var apiResult = JsonConvert.DeserializeObject<API>(content);
+            Console.WriteLine("fact: " + apiResult.Fact);
+            Console.WriteLine("lenght: " + apiResult.Length);
+            
+
+        }
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+        public IActionResult Error()
+        {
             return View();
         }
     }
