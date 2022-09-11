@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.Extensions.FileProviders;
 using static System.Net.Mime.MediaTypeNames;
 using Microsoft.Extensions.FileProviders;
+using Demo_T1.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,14 +20,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
-//builder.Host.ConfigureLogging(logging =>
-//{
-//    logging.ClearProviders();
-//    logging.AddConsole();
-//});
-
 builder.Services.AddRazorPages();
 
+builder.Services.Configure<PositionOptions>(
+    builder.Configuration.GetSection(PositionOptions.Position));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -102,21 +99,21 @@ app.UseStatusCodePages(async statusCodeContext =>
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-var fileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.WebRootPath, "images"));
-var requestPath = "/MyImages";
+//var fileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.WebRootPath, "images"));
+//var requestPath = "/MyImages";
 
 // Enable displaying browser links.
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = fileProvider,
-    RequestPath = requestPath
-});
+//app.UseStaticFiles(new StaticFileOptions
+//{
+//    FileProvider = fileProvider,
+//    RequestPath = requestPath
+//});
 
-app.UseDirectoryBrowser(new DirectoryBrowserOptions
-{
-    FileProvider = fileProvider,
-    RequestPath = requestPath
-});
+//app.UseDirectoryBrowser(new DirectoryBrowserOptions
+//{
+//    FileProvider = fileProvider,
+//    RequestPath = requestPath
+//});
 
 app.UseRouting();
 

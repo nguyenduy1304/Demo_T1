@@ -3,6 +3,7 @@ using Demo_T1.Services;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using System.Diagnostics;
@@ -14,7 +15,10 @@ namespace Demo_T1.Controllers
     [IgnoreAntiforgeryToken]
     public class HomeController : Controller
     {
-        
+        private readonly PositionOptions _options;
+
+        private readonly IConfiguration Configuration;
+
         private readonly ILogger _logger;
 
         #region DI
@@ -65,9 +69,15 @@ namespace Demo_T1.Controllers
 
                                 ISingletonService singletonService1,
                                 ISingletonService singletonService2,
-                                ILogger<HomeController> logger)
+                                ILogger<HomeController> logger,
+
+                                IOptions<PositionOptions> options,
+
+                                IConfiguration configuration)
         {
             _logger = logger;
+            _options = options.Value;
+            Configuration = configuration;
 
             _transientService1 = transientService1;
             _transientService2 = transientService2;
@@ -77,7 +87,8 @@ namespace Demo_T1.Controllers
 
             _singletonService1 = singletonService1;
             _singletonService2 = singletonService2;
-           
+
+            
 
         }
         //public void OnGet()
@@ -111,6 +122,24 @@ namespace Demo_T1.Controllers
             _logger.LogWarning("Xin chào LogWarning nhá !!! {DT}",
                DateTime.UtcNow.ToLongTimeString());
             #endregion
+
+            #region Options
+            ViewBag.message7 = _options;
+            #endregion
+
+            #region Configuration
+            var myKeyValue = Configuration["MyKey"];
+            var title = Configuration["Position:Title"];
+            var name = Configuration["Position:Name"];
+            var defaultLogLevel = Configuration["Logging:LogLevel:Default"];
+
+
+            //return Content($"MyKey value: {myKeyValue} \n" +
+            //               $"Title: {title} \n" +
+            //               $"Name: {name} \n" +
+            //               $"Default Log Level: {defaultLogLevel}");
+            #endregion
+
 
             GetAPI();
             return View();
